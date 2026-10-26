@@ -1,0 +1,15 @@
+{
+  "_doc": "Colour filters shared by the preview (SVG feColorMatrix + CSS) and the export (FFmpeg eq + colorchannelmixer). matrix rows are output R, G, B as [r, g, b] weights; eq is applied first.",
+  "none": {"label": "Original", "eq": {"b": 0, "c": 1, "s": 1}},
+  "vif": {"label": "Vif", "eq": {"b": 0.02, "c": 1.12, "s": 1.4}},
+  "chaud": {"label": "Chaud", "eq": {"b": 0.02, "c": 1.06, "s": 1.15}, "matrix": [[1.18, 0.08, 0], [0.04, 1.02, 0], [0, 0, 0.72]]},
+  "froid": {"label": "Froid", "eq": {"b": 0, "c": 1.06, "s": 1.0}, "matrix": [[0.8, 0, 0], [0, 1.0, 0.06], [0, 0.1, 1.22]]},
+  "cine": {"label": "Ciné", "eq": {"b": -0.03, "c": 1.22, "s": 0.85}, "matrix": [[1.06, 0.04, -0.06], [0, 1.0, 0.02], [-0.06, 0.1, 0.98]]},
+  "nb": {"label": "N&B", "eq": {"b": 0, "c": 1.18, "s": 0}},
+  "vintage": {"label": "Vintage", "eq": {"b": 0.03, "c": 0.92, "s": 0.9}, "matrix": [[0.75, 0.35, 0.08], [0.14, 0.82, 0.07], [0.11, 0.21, 0.6]]},
+  "fade": {"label": "Fade", "eq": {"b": 0.06, "c": 0.8, "s": 0.82}},
+  "drama": {"label": "Drama", "eq": {"b": -0.04, "c": 1.38, "s": 0.92}},
+  "golden": {"label": "Golden", "eq": {"b": 0.03, "c": 1.1, "s": 1.15}, "matrix": [[1.12, 0.08, 0], [0.05, 1.02, 0], [0, 0, 0.75]]},
+  "teal": {"label": "Teal", "eq": {"b": 0, "c": 1.12, "s": 1.05}, "matrix": [[0.92, 0.05, 0.03], [0, 1.02, 0.04], [0, 0.12, 1.05]]},
+  "rose": {"label": "Rose", "eq": {"b": 0.03, "c": 1.0, "s": 1.05}, "matrix": [[1.08, 0, 0.04], [0, 0.95, 0.03], [0.02, 0, 1.0]]}
+}

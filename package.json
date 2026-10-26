@@ -1,0 +1,77 @@
+{
+  "name": "ussamaediting",
+  "version": "0.3.0",
+  "description": "UssamaEditing by Ussamai - free CapCut-style video editor with offline Darija auto-captions (Electron + React + FFmpeg)",
+  "main": "electron/main.cjs",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "vite build",
+    "start": "vite build && electron .",
+    "test": "node scripts/test-export.cjs && node scripts/test-captions.cjs",
+    "test:export": "node scripts/test-export.cjs",
+    "test:captions": "node scripts/test-captions.cjs",
+    "dist": "vite build && electron-builder --mac dmg --arm64",
+    "dist:win": "vite build && electron-builder --win nsis --x64"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^6.0.7"
+  },
+  "productName": "UssamaEditing",
+  "author": "Ussamai",
+  "build": {
+    "appId": "com.ussamai.editing",
+    "productName": "UssamaEditing",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "shared/**",
+      "assets/**",
+      "package.json",
+      "!node_modules/ffprobe-static/bin/win32/**",
+      "!node_modules/ffprobe-static/bin/linux/**"
+    ],
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**",
+      "node_modules/ffprobe-static/**",
+      "assets/fonts/**",
+      "electron/cutout.swift"
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.video",
+      "identity": null,
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "UssamaEditing uses the microphone to record voice-overs."
+      }
+    },
+    "dmg": {
+      "title": "UssamaEditing"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
