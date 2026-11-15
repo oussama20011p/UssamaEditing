@@ -1,0 +1,43 @@
+# Builds the macOS (Apple Silicon) and Windows installers on their own OS, so each one bundles the
+# right FFmpeg. Runs the MCP test on both. A pushed tag (v0.4.0…) also publishes a GitHub Release.
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            dist: dist
+            files: release/*.dmg
+          - os: windows-latest
+            dist: dist:win
+            files: release/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/test-mcp.cjs
+      - run: npm run ${{ matrix.dist }} -- --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UssamaEditing-${{ matrix.os }}
+          path: ${{ matrix.files }}
+      - if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.files }}
