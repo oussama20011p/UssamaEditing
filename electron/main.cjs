@@ -160,6 +160,27 @@ const handlers = {
     return pick.canceled ? null : fs.readFileSync(pick.filePaths[0], 'utf8');
   },
   'shell:show': (file) => shell.showItemInFolder(file),
+
+  // Registers the MCP server (electron/mcp.cjs) with Claude Desktop, run by this app's own binary
+  // as Node, so nothing else needs installing. Also returns the same command for Claude Code.
+  'claude:connect': () => {
+    const script = path.join(__dirname, 'mcp.cjs');
+    const server = { command: process.execPath, args: [script], env: { ELECTRON_RUN_AS_NODE: '1' } };
+    const configFile = path.join(app.getPath('appData'), 'Claude', 'claude_desktop_config.json');
+    let config = {};
+    if (fs.existsSync(configFile)) {
+      try {
+        config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+      } catch {
+        throw new Error(`${configFile} is not valid JSON: fix it or remove it first.`);
+      }
+    }
+    config.mcpServers = { ...config.mcpServers, 'ussama-editing': server };
+    fs.mkdirSync(path.dirname(configFile), { recursive: true });
+    fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
+    const q = (s) => `"${s}"`;
+    return { configFile, claudeCode: `claude mcp add ussama-editing -s user -e ELECTRON_RUN_AS_NODE=1 -- ${q(process.execPath)} ${q(script)}` };
+  },
 };
 
 for (const [channel, fn] of Object.entries(handlers)) ipcMain.handle(channel, (_event, ...args) => fn(...args));
@@ -187,5 +208,26 @@ app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((_wc, permission, allow) => allow(permission === 'media'));
   if (process.platform === 'darwin' && app.dock && fs.existsSync(ICON)) app.dock.setIcon(nativeImage.createFromPath(ICON));
   openWindow();
+  watchClaudeEdits();
 });
+
+// Projects saved by the MCP server (electron/mcp.cjs) are marked by: 'claude'. Push them to the UI
+// so Claude's edits show up live; the UI's own autosave drops the mark, so this never loops.
+function watchClaudeEdits() {
+  const dir = path.dirname(lib.projects.file('x'));
+  const seen = new Map();
+  fs.watch(dir, (_event, name) => {
+    if (!name?.endsWith('.json')) return;
+    let data;
+    try {
+      data = JSON.parse(fs.readFileSync(path.join(dir, name), 'utf8'));
+    } catch {
+      return; // half-written or deleted
+    }
+    const { meta, project } = data;
+    if (meta?.by !== 'claude' || seen.get(meta.id) === meta.updatedAt) return;
+    seen.set(meta.id, meta.updatedAt);
+    send('project:external', { id: meta.id, project });
+  });
+}
 app.on('window-all-closed', () => app.quit());

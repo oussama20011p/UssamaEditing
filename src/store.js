@@ -111,6 +111,15 @@ export function projectDuration(p) {
   return Math.max(0, ...ends);
 }
 
+// What the home screen shows for a project.
+export function projectMeta(id, p) {
+  const firstVisual = p.media.find((m) => m.thumb && !m.sticker);
+  return {
+    id, name: p.name, format: p.format || `${p.width}×${p.height}`, duration: projectDuration(p),
+    clips: p.videoClips.length, thumb: firstVisual?.thumb || null,
+  };
+}
+
 // Total duration of what gets exported (the video track drives the output length).
 export function exportDuration(p) {
   const v = videoLayout(p.videoClips);
@@ -251,6 +260,8 @@ const sameTime = (a, b) => Math.abs(a - b) <= 0.02;
 
 const ACTIONS = {
   load: (p, a) => normalizeProject(a.project),
+  // A change Claude made through the MCP server: swapped in like any edit, so it can be undone.
+  replace: (p, a) => normalizeProject(a.project),
   setName: (p, a) => ({ ...p, name: a.name }),
   setFormat: (p, a) => (FORMATS[a.format] ? { ...p, format: a.format, width: FORMATS[a.format].width, height: FORMATS[a.format].height } : p),
   setCaptionStyle: (p, a) => ({ ...p, captionStyle: { ...p.captionStyle, ...a.patch } }),

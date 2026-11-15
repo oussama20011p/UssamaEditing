@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FORMATS, emptyProject, formatTime, normalizeProject, uid } from './store.js';
-import { projectMeta } from './App.jsx';
+import { FORMATS, emptyProject, formatTime, normalizeProject, projectMeta, uid } from './store.js';
 import Icon, { Logo } from './components/Icon.jsx';
 import { LangSwitch, useT } from './i18n.jsx';
 
@@ -54,6 +53,15 @@ export default function Home({ onOpen }) {
 
   const open = async (meta) => onOpen({ id: meta.id, project: await window.api.loadProject(meta.id) });
 
+  const connectClaude = async () => {
+    try {
+      const res = await window.api.connectClaude();
+      alert(`${t('claudeConnected')}\n\n${res.configFile}\n\nClaude Code:\n${res.claudeCode}`);
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
   const importFile = async () => {
     const json = await window.api.openProject();
     if (!json) return;
@@ -102,6 +110,7 @@ export default function Home({ onOpen }) {
           <div className="home-head">
             <span className="home-idx">01</span>
             <h2>{t('newProject')}</h2>
+            <button className="ghost" onClick={connectClaude}>✳ {t('connectClaude')}</button>
             <button className="ghost" onClick={importFile}><Icon name="folder" size={15} /> {t('openFile')}</button>
           </div>
           <div className="format-cards">

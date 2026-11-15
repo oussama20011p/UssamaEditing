@@ -27,6 +27,7 @@
 | 😀 **Stickers** | 32 colour emoji stickers with a pop entrance. Emoji typed in text are drawn with Noto Emoji. |
 | 🎙️ **Voice** | Record a voice-over from the microphone, or turn text into speech with the system voices (Arabic, French, English). |
 | 🔊 **Sound effects** | 30 built-in effects (whoosh, pop, ding, boom, riser, typing, glitch, cha-ching, heartbeat, applause, drumroll…), generated on your computer and level-matched, free to use. |
+| 🤖 **Edit with Claude** | Connect Claude in one click, then just ask: «dir lia captions b darija, hook f lowel, whoosh o exporti». Claude edits the project and you watch it change live in the app. |
 | 🏠 **Home** | Animated start screen: new project by format, and your recent projects (autosaved) with thumbnails. |
 | 🌍 **Languages** | Interface in Darija, French or English. |
 | 🧩 **Templates** | Reel hook + captions, podcast clip, product ad, tutorial, YouTube: add styled text and a caption look in one click. |
@@ -38,10 +39,36 @@
 
 Everything runs on your computer. Nothing is uploaded. Your project is autosaved as you work.
 
-## Install (macOS, Apple Silicon)
+## Install
 
-Download `UssamaEditing-<version>-arm64.dmg` from the Releases page, open it and drag UssamaEditing to Applications.
+**macOS (Apple Silicon):** download `UssamaEditing-<version>-arm64.dmg` from the [Releases](https://github.com/oussama20011p/UssamaEditing/releases) page, open it and drag UssamaEditing to Applications.
 The app is not signed with an Apple developer certificate yet, so the first time: right-click the app → **Open** → **Open**.
+
+**Windows (64-bit):** download `UssamaEditing Setup <version>.exe` from the Releases page and run it.
+Windows SmartScreen may warn because the installer is not signed: **More info** → **Run anyway**.
+Background removal and system text-to-speech are macOS only for now; everything else works the same.
+
+## Edit with Claude (MCP)
+
+UssamaEditing comes with an [MCP](https://modelcontextprotocol.io) server, so Claude can edit your videos for you.
+
+1. Open UssamaEditing and click **Connect Claude** on the home screen. This adds the server to Claude Desktop
+   (and shows the command for Claude Code).
+2. Restart Claude Desktop.
+3. Ask Claude, for example: *"Create a 9:16 project from ~/Desktop/video.mp4, add Darija captions, a hook
+   «ما تبقاش تخلص CapCut» on top, a whoosh at the start, and export it."*
+
+Projects Claude creates or edits open in the app by themselves and update live; **⌘Z / Ctrl+Z** undoes Claude's change.
+
+Tools: `list_projects`, `create_project`, `get_project`, `add_media`, `auto_captions`, `set_caption_style`, `add_text`,
+`add_sound_effect`, `edit_clip`, `edit_all_main_clips`, `split_clip`, `delete_clip`, `apply_template`, `remove_background`,
+`export_video`, `list_options`.
+
+Manual setup (Claude Code), from source:
+
+```bash
+claude mcp add ussama-editing -s user -- node /path/to/UssamaEditing/electron/mcp.cjs
+```
 
 To build the installer yourself: `npm run dist` (macOS `.dmg`) or `npm run dist:win` (Windows installer).
 
@@ -68,6 +95,9 @@ mkdir -p ~/.cache/whisper
 curl -L -o ~/.cache/whisper/ggml-large-v3-turbo.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
 ```
 
+On **Windows**: download `whisper-bin-x64.zip` from the [whisper.cpp releases](https://github.com/ggml-org/whisper.cpp/releases),
+unzip it into `%USERPROFILE%\.cache\whisper`, and put the model file in the same folder.
+
 `ggml-large-v3-turbo.bin` (~1.6 GB) gives the best Darija. For a smaller, faster download use `ggml-base.bin` instead.
 The app picks the best model it finds in `~/.cache/whisper`.
 
@@ -93,6 +123,8 @@ The app picks the best model it finds in `~/.cache/whisper`.
   which shapes Arabic correctly. The preview (`src/textStyle.js`) mirrors the same styles.
 - Overlays are composited by FFmpeg (`overlay`, `geq` masks, `colorkey`), with keyframes turned into expressions of time (`shared/keyframes.cjs`).
 - Background removal (`electron/cutout.swift` + `electron/cutout.cjs`): Apple Vision person masks merged with the frames into a transparent VP9 WebM.
+- Claude (`electron/mcp.cjs`): an MCP server over stdio. It edits saved projects with the same actions as the UI (`src/store.js`)
+  and marks them `by: 'claude'`; the app watches its project folder and loads those changes live.
 - Captions (`electron/whisper.cjs`): the main track's audio is extracted at 16 kHz and transcribed by `whisper-cli`
   with one segment per word; `src/captions.js` groups words into on-screen captions.
 
@@ -104,6 +136,7 @@ npm test
 
 `test:export` renders a 9:16 project with speed changes, transitions, styled text and captions and checks the output.
 `test:captions` checks caption grouping and, when Whisper is installed, transcribes a sample clip.
+`test:mcp` drives the MCP server like Claude does: create a project, add text, a sound effect, edits, captions (pass a speech clip) and an export.
 
 ## Credits and license
 

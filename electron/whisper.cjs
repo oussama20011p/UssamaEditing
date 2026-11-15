@@ -11,9 +11,11 @@ const BIN_CANDIDATES = ['/opt/homebrew/bin/whisper-cli', '/usr/local/bin/whisper
 const MODEL_DIRS = [path.join(os.homedir(), '.cache', 'whisper'), '/opt/homebrew/share/whisper.cpp', '/usr/local/share/whisper.cpp'];
 const MODEL_PREFERENCE = ['large-v3-turbo', 'large-v3', 'medium', 'small', 'base'];
 
+// Windows: whisper-cli.exe on PATH, or unzipped from the whisper.cpp release into ~/.cache/whisper.
+const EXE = process.platform === 'win32' ? 'whisper-cli.exe' : 'whisper-cli';
 function findBinary() {
-  const fromPath = (process.env.PATH || '').split(path.delimiter).map((d) => path.join(d, 'whisper-cli'));
-  return [...BIN_CANDIDATES, ...fromPath].find((p) => fs.existsSync(p)) || null;
+  const dirs = [...(process.env.PATH || '').split(path.delimiter), MODEL_DIRS[0], path.join(MODEL_DIRS[0], 'Release')];
+  return [...BIN_CANDIDATES, ...dirs.map((d) => path.join(d, EXE))].find((p) => fs.existsSync(p)) || null;
 }
 
 function findModel() {
@@ -45,7 +47,7 @@ function parseWords(json) {
 // Returns { promise, cancel }; promise resolves to [{ text, start, end }] on the project timeline.
 function transcribe(project, language, onProgress) {
   const { binary, model } = status();
-  if (!binary) throw new Error('whisper-cli ma kaynch. 7elli Terminal w kteb: brew install whisper-cpp');
+  if (!binary) throw new Error(process.platform === 'win32' ? 'whisper-cli.exe ma kaynch. Nzzel whisper-bin-x64.zip mn github.com/ggml-org/whisper.cpp/releases w 7ell-o f %USERPROFILE%\\.cache\\whisper (ra README).' : 'whisper-cli ma kaynch. 7elli Terminal w kteb: brew install whisper-cpp');
   if (!model) throw new Error('Ma kayn ta model Whisper f ~/.cache/whisper. Nzzel ggml-large-v3-turbo.bin (ra README).');
 
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ussama-asr-'));

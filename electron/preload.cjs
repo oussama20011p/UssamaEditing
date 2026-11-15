@@ -32,8 +32,9 @@ const CALLS = {
   cancelCaptions: 'captions:cancel',
   removeBackground: 'cutout:start',
   cancelCutout: 'cutout:cancel',
+  connectClaude: 'claude:connect',
 };
-const EVENTS = { onExportProgress: 'export:progress', onCaptionsProgress: 'captions:progress', onCutoutProgress: 'cutout:progress' };
+const EVENTS = { onExportProgress: 'export:progress', onCaptionsProgress: 'captions:progress', onCutoutProgress: 'cutout:progress', onExternalProject: 'project:external' };
 
 const api = { platform: process.platform };
 for (const [name, channel] of Object.entries(CALLS)) api[name] = call(channel);

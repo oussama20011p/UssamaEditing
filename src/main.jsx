@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import Editor from './App.jsx';
 import Home from './Home.jsx';
@@ -8,6 +8,8 @@ import './styles.css';
 // Home screen (new project + history) until a project is opened, then the editor.
 function Root() {
   const [open, setOpen] = useState(null); // { id, project }
+  // A project Claude creates or edits (MCP server) opens by itself while you're on the home screen.
+  useEffect(() => window.api.onExternalProject((ext) => setOpen((cur) => cur || ext)), []);
   if (open) return <Editor key={open.id} projectId={open.id} initialProject={open.project} onHome={() => setOpen(null)} />;
   return <Home onOpen={setOpen} />;
 }

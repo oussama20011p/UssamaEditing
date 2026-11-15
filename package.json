@@ -1,6 +1,6 @@
 {
   "name": "ussamaediting",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "UssamaEditing by Ussamai - free CapCut-style video editor with offline Darija auto-captions (Electron + React + FFmpeg)",
   "main": "electron/main.cjs",
   "private": true,
@@ -8,11 +8,13 @@
   "scripts": {
     "build": "vite build",
     "start": "vite build && electron .",
-    "test": "node scripts/test-export.cjs && node scripts/test-captions.cjs",
+    "test": "node scripts/test-export.cjs && node scripts/test-captions.cjs && node scripts/test-mcp.cjs",
     "test:export": "node scripts/test-export.cjs",
     "test:captions": "node scripts/test-captions.cjs",
     "dist": "vite build && electron-builder --mac dmg --arm64",
-    "dist:win": "vite build && electron-builder --win nsis --x64"
+    "dist:win": "vite build && electron-builder --win nsis --x64",
+    "test:mcp": "node scripts/test-mcp.cjs",
+    "mcp": "node electron/mcp.cjs"
   },
   "dependencies": {
     "ffmpeg-static": "^5.2.0",
@@ -40,14 +42,20 @@
       "shared/**",
       "assets/**",
       "package.json",
-      "!node_modules/ffprobe-static/bin/win32/**",
-      "!node_modules/ffprobe-static/bin/linux/**"
+      "src/store.js",
+      "src/captions.js",
+      "src/templates.js",
+      "src/package.json"
     ],
     "asarUnpack": [
       "node_modules/ffmpeg-static/**",
       "node_modules/ffprobe-static/**",
       "assets/fonts/**",
-      "electron/cutout.swift"
+      "electron/cutout.swift",
+      "src/store.js",
+      "src/captions.js",
+      "src/templates.js",
+      "src/package.json"
     ],
     "mac": {
       "target": [
@@ -58,7 +66,11 @@
       "identity": null,
       "extendInfo": {
         "NSMicrophoneUsageDescription": "UssamaEditing uses the microphone to record voice-overs."
-      }
+      },
+      "files": [
+        "!node_modules/ffprobe-static/bin/win32/**",
+        "!node_modules/ffprobe-static/bin/linux/**"
+      ]
     },
     "dmg": {
       "title": "UssamaEditing"
@@ -67,7 +79,11 @@
       "target": [
         "nsis"
       ],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "files": [
+        "!node_modules/ffprobe-static/bin/darwin/**",
+        "!node_modules/ffprobe-static/bin/linux/**"
+      ]
     },
     "nsis": {
       "oneClick": false,

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { FORMATS, canRedo, canUndo, emptyProject, historyReducer, initialHistory, normalizeProject, projectDuration, uid, videoClipAt, videoLayout } from './store.js';
+import { FORMATS, canRedo, canUndo, emptyProject, historyReducer, initialHistory, normalizeProject, projectDuration, projectMeta, uid, videoClipAt, videoLayout } from './store.js';
 import { flattenWords, groupWords } from './captions.js';
 import { TEMPLATES } from './templates.js';
 import { useShortcuts } from './shortcuts.js';
@@ -10,15 +10,6 @@ import Inspector from './components/Inspector.jsx';
 import ExportDialog from './components/ExportDialog.jsx';
 import { LangSwitch, useT } from './i18n.jsx';
 import Icon, { Logo } from './components/Icon.jsx';
-
-// What the home screen shows for a project.
-export function projectMeta(id, p) {
-  const firstVisual = p.media.find((m) => m.thumb && !m.sticker);
-  return {
-    id, name: p.name, format: p.format || `${p.width}×${p.height}`, duration: projectDuration(p),
-    clips: p.videoClips.length, thumb: firstVisual?.thumb || null,
-  };
-}
 
 // Runs a main-process job while forwarding its progress events.
 async function trackJob(subscribe, run, onProgress) {
@@ -66,6 +57,8 @@ export default function Editor({ projectId, initialProject, onHome }) {
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project]);
+  // Claude's edits to this project (MCP server) replace it live; Ctrl+Z undoes them.
+  useEffect(() => window.api.onExternalProject((ext) => ext.id === projectId && dispatch({ type: 'replace', project: ext.project })), [projectId]);
   const goHome = async () => {
     setPlaying(false);
     await persist();

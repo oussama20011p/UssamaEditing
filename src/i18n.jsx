@@ -12,6 +12,8 @@ const S = {
   recent: { dr: 'Projets li fatou', fr: 'Projets récents', en: 'Recent projects' },
   noProjects: { dr: 'Mazal ma 3ndek ta projet', fr: 'Aucun projet pour l’instant', en: 'No projects yet' },
   noProjectsHint: { dr: 'Khtar format l-fo9 bach tbda l-montage lowel dyalk.', fr: 'Choisis un format ci-dessus pour commencer ton premier montage.', en: 'Pick a format above to start your first edit.' },
+  connectClaude: { dr: 'Rbet m3a Claude', fr: 'Connecter Claude', en: 'Connect Claude' },
+  claudeConnected: { dr: 'Claude mrbout ✓ 3awed 7ell Claude Desktop, o golih: «dir lia montage l had l-video».', fr: 'Claude est connecté ✓ Relance Claude Desktop et demande-lui : « monte cette vidéo ».', en: 'Claude is connected ✓ Restart Claude Desktop and ask it: "edit this video".' },
   open: { dr: '7ell', fr: 'Ouvrir', en: 'Open' },
   delete: { dr: 'Msa7', fr: 'Supprimer', en: 'Delete' },
   confirmDelete: { dr: 'Msa7 had l-projet? Ghaymchi l la Corbeille.', fr: 'Supprimer ce projet ? Il ira dans la Corbeille.', en: 'Delete this project? It goes to the Trash.' },
