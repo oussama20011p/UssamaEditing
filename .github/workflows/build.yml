@@ -33,6 +33,8 @@ jobs:
       - run: npm ci
       - run: node scripts/test-mcp.cjs
       - run: npm run ${{ matrix.dist }} -- --publish never
+        env:
+          USE_HARD_LINKS: 'false' # the macOS runner fails with EEXIST when electron-builder hard-links unpacked files
       - uses: actions/upload-artifact@v4
         with:
           name: UssamaEditing-${{ matrix.os }}
